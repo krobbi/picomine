@@ -9,6 +9,12 @@ pub enum Tile {
 }
 
 impl Tile {
+    /// A tile's width in pixels.
+    pub const WIDTH: i32 = 16;
+
+    /// A tile's height in pixels.
+    pub const HEIGHT: i32 = Self::WIDTH;
+
     /// Returns the tile's color.
     pub fn get_color(self) -> u32 {
         match self {
