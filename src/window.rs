@@ -1,6 +1,8 @@
-use minifb::{Scale, WindowOptions};
+pub use minifb::Key;
 
-/// A game window for drawing.
+use minifb::{KeyRepeat, Scale, WindowOptions};
+
+/// A game window for keyboard input and drawing.
 pub struct Window {
     /// The window's inner window.
     inner: minifb::Window,
@@ -29,13 +31,18 @@ impl Window {
         )
         .unwrap_or_else(|e| panic!("{e}"));
 
-        let buffer = vec![0x0d_07_09; Self::WIDTH * Self::HEIGHT];
+        let buffer = vec![0; Self::WIDTH * Self::HEIGHT];
         Self { inner, buffer }
     }
 
     /// Returns whether the window has not been closed.
     pub fn is_open(&self) -> bool {
         self.inner.is_open()
+    }
+
+    /// Returns whether a key started being pressed on the current frame.
+    pub fn is_key_pressed(&self, key: Key) -> bool {
+        self.inner.is_key_pressed(key, KeyRepeat::No)
     }
 
     /// Returns the window's framebuffer as a mutable slice.
