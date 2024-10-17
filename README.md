@@ -25,7 +25,7 @@ PicoMine uses the following libraries:
 rendering.
 
 # License
-PicoMine is released under the Krobbizoid Game Licnese (KGL):  
+PicoMine is released under the Krobbizoid Game License (KGL):  
 https://krobbi.github.io/license/2024/kgl.txt
 
 See [LICENSE.txt](/LICENSE.txt) for a full copy of the license text.
