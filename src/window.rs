@@ -1,6 +1,6 @@
 use minifb::{Scale, WindowOptions};
 
-/// A game window for rendering.
+/// A game window for drawing.
 pub struct Window {
     /// The window's inner window.
     inner: minifb::Window,
@@ -11,10 +11,10 @@ pub struct Window {
 
 impl Window {
     /// A window's width in pixels.
-    const WIDTH: usize = 320;
+    pub const WIDTH: usize = 320;
 
     /// A window's height in pixels.
-    const HEIGHT: usize = 180;
+    pub const HEIGHT: usize = 180;
 
     /// Creates and opens a new window.
     pub fn new() -> Self {
