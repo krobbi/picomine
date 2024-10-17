@@ -9,10 +9,13 @@ use window::Window;
 /// Opens a window and draws a test scene.
 fn main() {
     let mut window = Window::new();
-    Camera::draw_tile(Tile::Grass, 0, 0, &mut window);
-    Camera::draw_tile(Tile::Grass, 1, 1, &mut window);
-    Camera::draw_tile(Tile::Stone, 1, 2, &mut window);
-    Camera::draw_tile(Tile::Stone, 3, 2, &mut window);
+    let mut camera = Camera::new();
+    camera.set_position(0.5, 0.5);
+    camera.draw_tile(Tile::Grass, 0, 0, &mut window);
+    camera.draw_tile(Tile::Stone, -2, -2, &mut window);
+    camera.draw_tile(Tile::Stone, 2, -2, &mut window);
+    camera.draw_tile(Tile::Stone, -2, 2, &mut window);
+    camera.draw_tile(Tile::Stone, 2, 2, &mut window);
     draw_center_dot(&mut window);
 
     while window.is_open() {
