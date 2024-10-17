@@ -16,7 +16,7 @@ impl Window {
     /// A window's height in pixels.
     const HEIGHT: usize = 180;
 
-    /// Create a new window.
+    /// Creates and opens a new window.
     pub fn new() -> Self {
         let inner = minifb::Window::new(
             "PicoMine",
@@ -29,16 +29,21 @@ impl Window {
         )
         .unwrap_or_else(|e| panic!("{e}"));
 
-        let buffer = vec![0; Self::WIDTH * Self::HEIGHT];
+        let buffer = vec![0x0d_07_09; Self::WIDTH * Self::HEIGHT];
         Self { inner, buffer }
     }
 
-    /// Get whether the window is open.
+    /// Returns whether the window has not been closed.
     pub fn is_open(&self) -> bool {
         self.inner.is_open()
     }
 
-    /// Update the window.
+    /// Returns the window's framebuffer as a mutable slice.
+    pub fn buffer_mut(&mut self) -> &mut [u32] {
+        &mut self.buffer
+    }
+
+    /// Updates the window with its framebuffer.
     pub fn update(&mut self) {
         self.inner
             .update_with_buffer(&self.buffer, Self::WIDTH, Self::HEIGHT)
