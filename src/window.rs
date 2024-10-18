@@ -42,7 +42,7 @@ impl Window {
 
     /// Returns whether a key started being pressed on the current frame.
     pub fn is_key_pressed(&self, key: Key) -> bool {
-        self.inner.is_key_pressed(key, KeyRepeat::No)
+        self.inner.is_key_pressed(key, KeyRepeat::Yes)
     }
 
     /// Returns the window's framebuffer as a mutable slice.
