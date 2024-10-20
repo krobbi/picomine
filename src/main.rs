@@ -9,50 +9,45 @@ mod world;
 
 use camera::Camera;
 use tile::Tile;
-use window::{Key, Window};
+use window::{Key, MouseButton, Window};
 use world::World;
 
 /// Opens a window and draws a world with a camera.
 fn main() {
-    const CAMERA_STEP: f32 = 1.0;
-    const CENTER_INDEX: usize = Window::WIDTH / 2 + Window::HEIGHT / 2 * Window::WIDTH;
-    const CLEAR_COLOR: u32 = 0x0d_07_09;
-
     let mut window = Window::new();
     let mut world = World::new();
     let mut camera = Camera::new();
-    let mut x = 16.5;
+    let mut x = 16.0;
     let mut y = 16.5;
 
     while window.is_open() {
         if window.is_key_pressed(Key::W) {
-            y -= CAMERA_STEP;
+            y -= 1.0;
         } else if window.is_key_pressed(Key::A) {
-            x -= CAMERA_STEP;
+            x -= 1.0;
         } else if window.is_key_pressed(Key::S) {
-            y += CAMERA_STEP;
+            y += 1.0;
         } else if window.is_key_pressed(Key::D) {
-            x += CAMERA_STEP;
-        }
-
-        if window.is_key_pressed(Key::Up) {
-            let (x, y) = world_to_tile_position(x, y);
-            world.set_tile(x, y, Tile::Stone);
-        } else if window.is_key_pressed(Key::Down) {
-            let (x, y) = world_to_tile_position(x, y);
-            world.set_tile(x, y, Tile::Grass);
+            x += 1.0;
         }
 
         camera.set_position(x, y);
-        window.buffer_mut().fill(CLEAR_COLOR);
+
+        if window.is_mouse_button_down(MouseButton::Left) {
+            set_mouse_tile(&window, camera, &mut world, Tile::Grass);
+        } else if window.is_mouse_button_down(MouseButton::Right) {
+            set_mouse_tile(&window, camera, &mut world, Tile::Stone);
+        }
+
+        window.buffer_mut().fill(0x0d_07_09);
         camera.draw_world(&mut world, &mut window);
-        window.buffer_mut()[CENTER_INDEX] = CLEAR_COLOR;
         window.update();
     }
 }
 
-/// Returns a world position as a tile position.
-fn world_to_tile_position(x: f32, y: f32) -> (i32, i32) {
-    #[allow(clippy::cast_possible_truncation)]
-    (x.floor() as i32, y.floor() as i32)
+/// Sets a tile at the current mouse position.
+fn set_mouse_tile(window: &Window, camera: Camera, world: &mut World, tile: Tile) {
+    let (x, y) = window.get_mouse_position();
+    let (x, y) = camera.screen_to_tile_position(x, y);
+    world.set_tile(x, y, tile);
 }

@@ -1,8 +1,8 @@
-pub use minifb::Key;
+pub use minifb::{Key, MouseButton};
 
-use minifb::{KeyRepeat, Scale, WindowOptions};
+use minifb::{KeyRepeat, MouseMode, Scale, WindowOptions};
 
-/// A game window for keyboard input and drawing.
+/// A game window for input and drawing.
 pub struct Window {
     /// The window's inner window.
     inner: minifb::Window,
@@ -35,6 +35,11 @@ impl Window {
         Self { inner, buffer }
     }
 
+    /// Returns the current mouse position clamped to screen space.
+    pub fn get_mouse_position(&self) -> (f32, f32) {
+        self.inner.get_mouse_pos(MouseMode::Clamp).unwrap()
+    }
+
     /// Returns whether the window has not been closed.
     pub fn is_open(&self) -> bool {
         self.inner.is_open()
@@ -43,6 +48,11 @@ impl Window {
     /// Returns whether a key started being pressed on the current frame.
     pub fn is_key_pressed(&self, key: Key) -> bool {
         self.inner.is_key_pressed(key, KeyRepeat::No)
+    }
+
+    /// Returns whether a mouse button is currently being held down.
+    pub fn is_mouse_button_down(&self, mouse_button: MouseButton) -> bool {
+        self.inner.get_mouse_down(mouse_button)
     }
 
     /// Returns the window's framebuffer as a mutable slice.

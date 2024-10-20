@@ -1,69 +1,79 @@
 use crate::{tile::Tile, window::Window, world::World};
 
-/// A camera for drawing in world space.
+/// A camera with a world position.
 #[derive(Clone, Copy)]
 pub struct Camera {
-    /// The camera's center X position.
+    /// The camera's left edge in world space.
     x: f32,
 
-    /// The camera's center Y position.
+    /// The camera's top edge in world space.
     y: f32,
 }
 
 impl Camera {
+    /// A tile's width in pixels as a floating-point number.
+    #[allow(clippy::cast_precision_loss)]
+    const TILE_WIDTH: f32 = Tile::WIDTH as f32;
+
+    /// A tile's height in pixels as a floating-point number.
+    #[allow(clippy::cast_precision_loss)]
+    const TILE_HEIGHT: f32 = Tile::HEIGHT as f32;
+
     /// Creates a new camera.
     pub fn new() -> Self {
         Self { x: 0.0, y: 0.0 }
     }
 
-    /// Sets the camera's center position.
+    /// Sets the camera's center world position.
     pub fn set_position(&mut self, x: f32, y: f32) {
-        (self.x, self.y) = (x, y);
+        #[allow(clippy::cast_precision_loss)]
+        const OFFSET_X: f32 = Window::WIDTH as f32 / Camera::TILE_WIDTH / 2.0;
+
+        #[allow(clippy::cast_precision_loss)]
+        const OFFSET_Y: f32 = Window::HEIGHT as f32 / Camera::TILE_HEIGHT / 2.0;
+
+        (self.x, self.y) = (x - OFFSET_X, y - OFFSET_Y);
+    }
+
+    /// Returns a tile positon from a screen position relative to the camera.
+    pub fn screen_to_tile_position(self, x: f32, y: f32) -> (i32, i32) {
+        #[allow(clippy::cast_possible_truncation)]
+        (
+            (self.x + x / Self::TILE_WIDTH).floor() as i32,
+            (self.y + y / Self::TILE_HEIGHT).floor() as i32,
+        )
     }
 
     /// Draws a world to a window.
     pub fn draw_world(self, world: &mut World, window: &mut Window) {
-        #[allow(clippy::cast_precision_loss)]
-        const TILE_WIDTH: f32 = Tile::WIDTH as f32;
-
-        #[allow(clippy::cast_precision_loss)]
-        const TILE_HEIGHT: f32 = Tile::HEIGHT as f32;
-
-        #[allow(clippy::cast_precision_loss)]
-        const EXTENT_X: f32 = Window::WIDTH as f32 / TILE_WIDTH / 2.0;
-
-        #[allow(clippy::cast_precision_loss)]
-        const EXTENT_Y: f32 = Window::HEIGHT as f32 / TILE_HEIGHT / 2.0;
-
-        let (offset_x, offset_y) = (self.x - EXTENT_X, self.y - EXTENT_Y);
-        let (x, y) = (offset_x.ceil(), offset_y.ceil());
+        let (tile_x, tile_y) = (self.x.ceil(), self.y.ceil());
 
         #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        let (offset_x, offset_y) = (
-            ((offset_x - x) * -TILE_WIDTH) as usize,
-            ((offset_y - y) * -TILE_HEIGHT) as usize,
+        let (pixel_x, pixel_y) = (
+            ((self.x - tile_x) * -Self::TILE_WIDTH) as usize,
+            ((self.y - tile_y) * -Self::TILE_HEIGHT) as usize,
         );
 
         #[allow(clippy::cast_possible_truncation)]
-        let (x, y) = (x as i32, y as i32);
+        let (tile_x, tile_y) = (tile_x as i32, tile_y as i32);
 
         #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
-        let tiles_down = ((Window::HEIGHT - offset_y) / Tile::HEIGHT) as i32;
+        let tiles_down = ((Window::HEIGHT - pixel_y) / Tile::HEIGHT) as i32;
 
-        let tiles_across = (Window::WIDTH - offset_x) / Tile::WIDTH;
+        let tiles_across = (Window::WIDTH - pixel_x) / Tile::WIDTH;
         let pixels_across = tiles_across * Tile::WIDTH;
 
         #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
         let tiles_across = tiles_across as i32;
 
         let buffer = window.buffer_mut();
-        let mut index = offset_x + offset_y * Window::WIDTH;
+        let mut index = pixel_x + pixel_y * Window::WIDTH;
 
-        for y in y..y + tiles_down {
+        for tile_y in tile_y..tile_y + tiles_down {
             const ROW_OFFSET: usize = Tile::HEIGHT * Window::WIDTH;
 
-            for x in x..x + tiles_across {
-                let color = world.get_tile(x, y).get_color();
+            for tile_x in tile_x..tile_x + tiles_across {
+                let color = world.get_tile(tile_x, tile_y).get_color();
 
                 for _ in 0..Tile::HEIGHT {
                     buffer[index..index + Tile::WIDTH].fill(color);

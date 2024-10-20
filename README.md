@@ -22,8 +22,8 @@ The game is in an early stage of development and is not yet playable.
 
 # Dependencies
 PicoMine uses the following libraries:
-* [minifb](https://crates.io/crates/minifb) - Window management, keyboard
-input, and framebuffer rendering.
+* [minifb](https://crates.io/crates/minifb) - Window management, input, and
+framebuffer rendering.
 
 # Credits
 PicoMine uses the color palette

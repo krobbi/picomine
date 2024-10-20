@@ -33,11 +33,6 @@ impl World {
 
     /// Returns or inserts the chunk at a chunk position in the world.
     fn get_chunk(&mut self, position: chunk::Position) -> &mut Chunk {
-        self.chunks.entry(position).or_insert_with_key(|p| {
-            #[cfg(debug_assertions)]
-            eprintln!("loaded chunk: {p:?}");
-
-            Chunk::new()
-        })
+        self.chunks.entry(position).or_insert_with(Chunk::new)
     }
 }
