@@ -8,7 +8,7 @@ pub struct Chunk {
 
 impl Chunk {
     /// A chunk's width in tiles.
-    const WIDTH: usize = 16;
+    const WIDTH: usize = 32;
 
     /// A chunk's height in tiles.
     const HEIGHT: usize = Self::WIDTH;
@@ -44,8 +44,21 @@ pub struct Position {
 impl Position {
     /// Creates a new chunk position and chunk index from a tile position.
     pub fn with_index(x: i32, y: i32) -> (Self, usize) {
-        // TODO: Implement this function. <krobbi>
+        #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+        const CHUNK_WIDTH: i32 = Chunk::WIDTH as i32;
+
+        #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+        const CHUNK_HEIGHT: i32 = Chunk::HEIGHT as i32;
+
+        let (chunk_x, chunk_y) = (x.div_euclid(CHUNK_WIDTH), y.div_euclid(CHUNK_HEIGHT));
+
         #[allow(clippy::cast_sign_loss)]
-        (Self { x: 0, y: 0 }, ((x & 15) + (y & 15) * 16) as usize)
+        let index =
+            (x - chunk_x * CHUNK_WIDTH + (y - chunk_y * CHUNK_HEIGHT) * CHUNK_WIDTH) as usize;
+
+        #[allow(clippy::cast_possible_truncation)]
+        let (x, y) = (chunk_x as i16, chunk_y as i16);
+
+        (Self { x, y }, index)
     }
 }

@@ -21,8 +21,8 @@ fn main() {
     let mut window = Window::new();
     let mut world = World::new();
     let mut camera = Camera::new();
-    let mut x = 0.5;
-    let mut y = 0.5;
+    let mut x = 16.5;
+    let mut y = 16.5;
 
     while window.is_open() {
         if window.is_key_pressed(Key::W) {
