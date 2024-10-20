@@ -22,7 +22,7 @@ impl Camera {
     }
 
     /// Draws a world to a window.
-    pub fn draw_world(self, window: &mut Window) {
+    pub fn draw_world(self, world: &mut World, window: &mut Window) {
         #[allow(clippy::cast_precision_loss)]
         const TILE_WIDTH: f32 = Tile::WIDTH as f32;
 
@@ -63,7 +63,7 @@ impl Camera {
             const ROW_OFFSET: usize = Tile::HEIGHT * Window::WIDTH;
 
             for x in x..x + tiles_across {
-                let color = World::get_tile(x, y).get_color();
+                let color = world.get_tile(x, y).get_color();
 
                 for _ in 0..Tile::HEIGHT {
                     buffer[index..index + Tile::WIDTH].fill(color);
