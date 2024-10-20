@@ -19,17 +19,23 @@ impl World {
         }
     }
 
-    /// Returns the tile at a position in the world.
+    /// Sets the tile at a tile position in the world.
+    pub fn set_tile(&mut self, x: i32, y: i32, tile: Tile) {
+        let (position, index) = chunk::Position::with_index(x, y);
+        self.get_chunk(position).set_tile(index, tile);
+    }
+
+    /// Returns the tile at a tile position in the world.
     pub fn get_tile(&mut self, x: i32, y: i32) -> Tile {
         let (position, index) = chunk::Position::with_index(x, y);
         self.get_chunk(position).get_tile(index)
     }
 
     /// Returns or inserts the chunk at a chunk position in the world.
-    fn get_chunk(&mut self, position: chunk::Position) -> &Chunk {
-        self.chunks.entry(position).or_insert_with_key(|k| {
+    fn get_chunk(&mut self, position: chunk::Position) -> &mut Chunk {
+        self.chunks.entry(position).or_insert_with_key(|p| {
             #[cfg(debug_assertions)]
-            eprintln!("loaded chunk: {k:?}");
+            eprintln!("loaded chunk: {p:?}");
 
             Chunk::new()
         })

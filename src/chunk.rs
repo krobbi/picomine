@@ -15,19 +15,14 @@ impl Chunk {
 
     /// Creates a new chunk.
     pub fn new() -> Self {
-        let mut tiles = [Tile::Stone; Self::WIDTH * Self::HEIGHT];
-
-        for x in 0..Self::WIDTH {
-            tiles[x] = Tile::Grass;
-            tiles[Self::WIDTH * Self::HEIGHT - 1 - x] = Tile::Grass;
+        Self {
+            tiles: [Tile::Grass; Self::WIDTH * Self::HEIGHT],
         }
+    }
 
-        for y in 1..Self::HEIGHT - 1 {
-            tiles[y * Self::WIDTH] = Tile::Grass;
-            tiles[y * Self::WIDTH + Self::WIDTH - 1] = Tile::Grass;
-        }
-
-        Self { tiles }
+    /// Sets the tile at an index in the chunk.
+    pub fn set_tile(&mut self, index: usize, tile: Tile) {
+        self.tiles[index] = tile;
     }
 
     /// Returns the tile at an index in the chunk.
@@ -47,7 +42,7 @@ pub struct Position {
 }
 
 impl Position {
-    /// Creates a new chunk position and index from a block position.
+    /// Creates a new chunk position and chunk index from a tile position.
     pub fn with_index(x: i32, y: i32) -> (Self, usize) {
         // TODO: Implement this function. <krobbi>
         #[allow(clippy::cast_sign_loss)]
