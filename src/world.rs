@@ -28,7 +28,9 @@ impl World {
     /// Returns or inserts the chunk at a chunk position in the world.
     fn get_chunk(&mut self, position: chunk::Position) -> &Chunk {
         self.chunks.entry(position).or_insert_with_key(|k| {
-            println!("loaded chunk: {k:?}");
+            #[cfg(debug_assertions)]
+            eprintln!("loaded chunk: {k:?}");
+
             Chunk::new()
         })
     }
