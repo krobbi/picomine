@@ -35,7 +35,7 @@ impl Camera {
         (self.x, self.y) = (x - OFFSET_X, y - OFFSET_Y);
     }
 
-    /// Returns a tile positon from a screen position relative to the camera.
+    /// Returns a tile position from a screen position relative to the camera.
     pub fn screen_to_tile_position(self, x: f32, y: f32) -> (i32, i32) {
         #[allow(clippy::cast_possible_truncation)]
         (
