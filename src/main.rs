@@ -17,21 +17,27 @@ fn main() {
     let mut window = Window::new();
     let mut world = World::new();
     let mut camera = Camera::new();
-    let mut x = 16.0;
-    let mut y = 16.5;
+    let (mut x, mut y) = (15.5, 15.5);
 
     while window.is_open() {
-        if window.is_key_pressed(Key::W) {
-            y -= 1.0;
-        } else if window.is_key_pressed(Key::A) {
-            x -= 1.0;
-        } else if window.is_key_pressed(Key::S) {
-            y += 1.0;
-        } else if window.is_key_pressed(Key::D) {
-            x += 1.0;
-        }
+        {
+            const SPEED: f32 = 4.0;
 
-        camera.set_position(x, y);
+            let (mut joy_x, mut joy_y) = (
+                f32::from(window.is_key_down(Key::D)) - f32::from(window.is_key_down(Key::A)),
+                f32::from(window.is_key_down(Key::S)) - f32::from(window.is_key_down(Key::W)),
+            );
+
+            if joy_x != 0.0 && joy_y != 0.0 {
+                const FRAC_1_SQRT_2: f32 = std::f32::consts::FRAC_1_SQRT_2;
+
+                (joy_x, joy_y) = (joy_x * FRAC_1_SQRT_2, joy_y * FRAC_1_SQRT_2);
+            }
+
+            let velocity = SPEED * window.get_delta();
+            (x, y) = (x + joy_x * velocity, y + joy_y * velocity);
+            camera.set_position(x, y);
+        }
 
         if window.is_mouse_button_down(MouseButton::Left) {
             set_mouse_tile(&window, camera, &mut world, Tile::Grass);

@@ -1,14 +1,22 @@
 pub use minifb::{Key, MouseButton};
 
-use minifb::{KeyRepeat, MouseMode, Scale, WindowOptions};
+use std::time::Instant;
 
-/// A game window for input and drawing.
+use minifb::{MouseMode, Scale, WindowOptions};
+
+/// A game window for timing, input, and drawing.
 pub struct Window {
     /// The window's inner window.
     inner: minifb::Window,
 
     /// The window's framebuffer.
     buffer: Vec<u32>,
+
+    /// The instant of the start of the current frame.
+    update_instant: Instant,
+
+    /// The duration of the previous frame in seconds.
+    delta: f32,
 }
 
 impl Window {
@@ -31,8 +39,17 @@ impl Window {
         )
         .unwrap_or_else(|e| panic!("{e}"));
 
-        let buffer = vec![0; Self::WIDTH * Self::HEIGHT];
-        Self { inner, buffer }
+        Self {
+            inner,
+            buffer: vec![0; Self::WIDTH * Self::HEIGHT],
+            update_instant: Instant::now(),
+            delta: 0.0,
+        }
+    }
+
+    /// Returns the duration of the previous frame in seconds.
+    pub fn get_delta(&self) -> f32 {
+        self.delta
     }
 
     /// Returns the current mouse position clamped to screen space.
@@ -45,9 +62,9 @@ impl Window {
         self.inner.is_open()
     }
 
-    /// Returns whether a key started being pressed on the current frame.
-    pub fn is_key_pressed(&self, key: Key) -> bool {
-        self.inner.is_key_pressed(key, KeyRepeat::No)
+    /// Returns whether a key is currently being held down.
+    pub fn is_key_down(&self, key: Key) -> bool {
+        self.inner.is_key_down(key)
     }
 
     /// Returns whether a mouse button is currently being held down.
@@ -60,10 +77,14 @@ impl Window {
         &mut self.buffer
     }
 
-    /// Updates the window with its framebuffer.
+    /// Updates the window with a new frame from its framebuffer.
     pub fn update(&mut self) {
         self.inner
             .update_with_buffer(&self.buffer, Self::WIDTH, Self::HEIGHT)
             .unwrap();
+
+        let now = Instant::now();
+        self.delta = now.duration_since(self.update_instant).as_secs_f32();
+        self.update_instant = now;
     }
 }
