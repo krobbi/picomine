@@ -67,23 +67,27 @@ impl Camera {
         let tiles_across = tiles_across as i32;
 
         let buffer = window.buffer_mut();
-        let mut index = pixel_x + pixel_y * Window::WIDTH;
+        let mut buffer_index = pixel_x + pixel_y * Window::WIDTH;
 
         for tile_y in tile_y..tile_y + tiles_down {
             const ROW_OFFSET: usize = Tile::HEIGHT * Window::WIDTH;
 
             for tile_x in tile_x..tile_x + tiles_across {
-                let color = world.get_tile(tile_x, tile_y).get_color();
+                let texture = world.get_tile(tile_x, tile_y).texture();
+                let mut texture_index = 0;
 
                 for _ in 0..Tile::HEIGHT {
-                    buffer[index..index + Tile::WIDTH].fill(color);
-                    index += Window::WIDTH;
+                    buffer[buffer_index..buffer_index + Tile::WIDTH]
+                        .copy_from_slice(&texture[texture_index..texture_index + Tile::WIDTH]);
+
+                    texture_index += Tile::WIDTH;
+                    buffer_index += Window::WIDTH;
                 }
 
-                index = index - ROW_OFFSET + Tile::WIDTH;
+                buffer_index = buffer_index - ROW_OFFSET + Tile::WIDTH;
             }
 
-            index = index + ROW_OFFSET - pixels_across;
+            buffer_index = buffer_index + ROW_OFFSET - pixels_across;
         }
     }
 }

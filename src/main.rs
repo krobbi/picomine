@@ -14,6 +14,8 @@ use world::World;
 
 /// Opens a window and draws a world with a camera.
 fn main() {
+    Tile::load_textures();
+
     let mut window = Window::new();
     let mut world = World::new();
     let mut camera = Camera::new();
