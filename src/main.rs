@@ -23,7 +23,8 @@ fn main() {
 
     while window.is_open() {
         {
-            const SPEED: f32 = 4.0;
+            const SPEED: f32 = 6.0;
+            const SLOW_SPEED: f32 = 0.5;
 
             let (mut joy_x, mut joy_y) = (
                 f32::from(window.is_key_down(Key::D)) - f32::from(window.is_key_down(Key::A)),
@@ -36,7 +37,12 @@ fn main() {
                 (joy_x, joy_y) = (joy_x * FRAC_1_SQRT_2, joy_y * FRAC_1_SQRT_2);
             }
 
-            let velocity = SPEED * window.get_delta();
+            let velocity = if window.is_key_down(Key::LeftShift) {
+                SLOW_SPEED
+            } else {
+                SPEED
+            } * window.get_delta();
+
             (x, y) = (x + joy_x * velocity, y + joy_y * velocity);
             camera.set_position(x, y);
         }
