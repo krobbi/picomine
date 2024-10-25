@@ -53,7 +53,6 @@ fn main() {
             set_mouse_tile(&window, camera, &mut world, Tile::Stone);
         }
 
-        window.buffer_mut().fill(0x0d_07_09);
         camera.draw_world(&mut world, &mut window);
         window.update();
     }

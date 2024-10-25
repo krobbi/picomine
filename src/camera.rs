@@ -46,48 +46,88 @@ impl Camera {
 
     /// Draws a world to a window.
     pub fn draw_world(self, world: &mut World, window: &mut Window) {
-        let (tile_x, tile_y) = (self.x.ceil(), self.y.ceil());
+        let buffer = window.buffer_mut();
+
+        let mut draw_tile =
+            |x, y, mut clip_index, clip_width, clip_height, buffer_index: &mut usize| {
+                let texture = world.get_tile(x, y).texture();
+
+                for _ in 0..clip_height {
+                    buffer[*buffer_index..*buffer_index + clip_width]
+                        .copy_from_slice(&texture[clip_index..clip_index + clip_width]);
+
+                    clip_index += Tile::WIDTH;
+                    *buffer_index += Window::WIDTH;
+                }
+            };
+
+        let mut buffer_index = 0;
+        let (left_x, top_y) = (self.x.floor(), self.y.floor());
 
         #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        let (pixel_x, pixel_y) = (
-            ((self.x - tile_x) * -Self::TILE_WIDTH) as usize,
-            ((self.y - tile_y) * -Self::TILE_HEIGHT) as usize,
+        let (left_clip_x, top_clip_y) = (
+            ((self.x - left_x) * Self::TILE_WIDTH) as usize,
+            ((self.y - top_y) * Self::TILE_HEIGHT) as usize,
+        );
+
+        let (left_clip_width, top_clip_height) =
+            (Tile::WIDTH - left_clip_x, Tile::HEIGHT - top_clip_y);
+
+        let (strip_width, strip_height) = (
+            (Window::WIDTH - left_clip_width) / Tile::WIDTH,
+            (Window::HEIGHT - top_clip_height) / Tile::HEIGHT,
+        );
+
+        let (right_clip_width, bottom_clip_height) = (
+            Window::WIDTH - left_clip_width - strip_width * Tile::WIDTH,
+            Window::HEIGHT - top_clip_height - strip_height * Tile::HEIGHT,
         );
 
         #[allow(clippy::cast_possible_truncation)]
-        let (tile_x, tile_y) = (tile_x as i32, tile_y as i32);
+        let (left_x, top_y) = (left_x as i32, top_y as i32);
 
         #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
-        let tiles_down = ((Window::HEIGHT - pixel_y) / Tile::HEIGHT) as i32;
+        let (right_x, bottom_y) = (
+            left_x + strip_width as i32 + 1,
+            top_y + strip_height as i32 + 1,
+        );
 
-        let tiles_across = (Window::WIDTH - pixel_x) / Tile::WIDTH;
-        let pixels_across = tiles_across * Tile::WIDTH;
+        let top_clip_index = top_clip_y * Tile::WIDTH;
 
-        #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
-        let tiles_across = tiles_across as i32;
+        let mut draw_strip = |x, clip_x, clip_width| {
+            const COLUMN_OFFSET: usize = Window::HEIGHT * Window::WIDTH;
 
-        let buffer = window.buffer_mut();
-        let mut buffer_index = pixel_x + pixel_y * Window::WIDTH;
+            draw_tile(
+                x,
+                top_y,
+                top_clip_index + clip_x,
+                clip_width,
+                top_clip_height,
+                &mut buffer_index,
+            );
 
-        for tile_y in tile_y..tile_y + tiles_down {
-            const ROW_OFFSET: usize = Tile::HEIGHT * Window::WIDTH;
-
-            for tile_x in tile_x..tile_x + tiles_across {
-                let texture = world.get_tile(tile_x, tile_y).texture();
-                let mut texture_index = 0;
-
-                for _ in 0..Tile::HEIGHT {
-                    buffer[buffer_index..buffer_index + Tile::WIDTH]
-                        .copy_from_slice(&texture[texture_index..texture_index + Tile::WIDTH]);
-
-                    texture_index += Tile::WIDTH;
-                    buffer_index += Window::WIDTH;
-                }
-
-                buffer_index = buffer_index - ROW_OFFSET + Tile::WIDTH;
+            for y in top_y + 1..bottom_y {
+                draw_tile(x, y, clip_x, clip_width, Tile::HEIGHT, &mut buffer_index);
             }
 
-            buffer_index = buffer_index + ROW_OFFSET - pixels_across;
+            draw_tile(
+                x,
+                bottom_y,
+                clip_x,
+                clip_width,
+                bottom_clip_height,
+                &mut buffer_index,
+            );
+
+            buffer_index -= COLUMN_OFFSET - clip_width;
+        };
+
+        draw_strip(left_x, left_clip_x, left_clip_width);
+
+        for x in left_x + 1..right_x {
+            draw_strip(x, 0, Tile::WIDTH);
         }
+
+        draw_strip(right_x, 0, right_clip_width);
     }
 }
