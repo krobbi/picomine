@@ -3,6 +3,7 @@
 
 mod camera;
 mod chunk;
+mod resources;
 mod tile;
 mod window;
 mod world;

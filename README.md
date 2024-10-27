@@ -18,10 +18,20 @@ The game has several design goals:
 * Progression to an ending through various mechanics and tiers of items.
 * World saving and loading.
 
-The game is in an early stage of development and is not yet playable.
+Currently, the player can move around a large, empty world with the `W`, `A`,
+`S`, and `D` keys. Grass and stone tiles can be placed with the left and right
+mouse buttons respectively. The player can slow down by holding the left shift
+key.
+
+The game loads textures relative to the working directory it was started from
+in the `res/` folder. Starting the game from outside of the repository root
+will result in missing textures.
+
+Chunks of tiles loaded by the player are never unloaded or saved.
 
 # Dependencies
 PicoMine uses the following libraries:
+* [image](https://crates.io/crates/image) - Texture image loading.
 * [minifb](https://crates.io/crates/minifb) - Window management, input, and
 framebuffer rendering.
 
