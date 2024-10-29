@@ -2,7 +2,7 @@ use std::{error, fmt, path::Path};
 
 use image::ImageError;
 
-/// Loads a texture from an image path or a default texture to a mutable buffer.
+/// Loads a texture from an image path or a default texture to a mutable slice.
 pub fn load_texture(path: &Path, width: usize, height: usize, texture: &mut [u32]) {
     if let Err(error) = try_load_texture(path, width, height, texture) {
         eprintln!("Failed to load texture `{}`: {error}", path.display());
@@ -10,7 +10,7 @@ pub fn load_texture(path: &Path, width: usize, height: usize, texture: &mut [u32
     }
 }
 
-/// Loads a texture from an image path to a mutable buffer or returns an error.
+/// Loads a texture from an image path to a mutable slice or returns an error.
 fn try_load_texture(
     path: &Path,
     width: usize,
@@ -40,7 +40,7 @@ fn try_load_texture(
     Ok(())
 }
 
-/// Loads a default texture to a mutable buffer.
+/// Loads a default texture to a mutable slice.
 fn load_default_texture(width: usize, height: usize, texture: &mut [u32]) {
     const BORDER_COLOR: u32 = 0x56_2e_73;
     const CENTER_COLOR: u32 = 0xa0_3a_9e;

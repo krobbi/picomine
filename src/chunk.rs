@@ -32,7 +32,7 @@ impl Chunk {
 }
 
 /// A chunk's position.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Position {
     /// The chunk position's X position.
     x: i16,

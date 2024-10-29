@@ -73,23 +73,25 @@ impl Camera {
         let (left_clip_width, top_clip_height) =
             (Tile::WIDTH - left_clip_x, Tile::HEIGHT - top_clip_y);
 
-        let (strip_width, strip_height) = (
+        let (center_width, center_height) = (
             (Window::WIDTH - left_clip_width) / Tile::WIDTH,
             (Window::HEIGHT - top_clip_height) / Tile::HEIGHT,
         );
 
         let (right_clip_width, bottom_clip_height) = (
-            Window::WIDTH - left_clip_width - strip_width * Tile::WIDTH,
-            Window::HEIGHT - top_clip_height - strip_height * Tile::HEIGHT,
+            Window::WIDTH - left_clip_width - center_width * Tile::WIDTH,
+            Window::HEIGHT - top_clip_height - center_height * Tile::HEIGHT,
         );
 
         #[allow(clippy::cast_possible_truncation)]
         let (left_x, top_y) = (left_x as i32, top_y as i32);
 
+        let (center_left_x, center_top_y) = (left_x + 1, top_y + 1);
+
         #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
         let (right_x, bottom_y) = (
-            left_x + strip_width as i32 + 1,
-            top_y + strip_height as i32 + 1,
+            center_left_x + center_width as i32,
+            center_top_y + center_height as i32,
         );
 
         let top_clip_index = top_clip_y * Tile::WIDTH;
@@ -106,7 +108,7 @@ impl Camera {
                 &mut buffer_index,
             );
 
-            for y in top_y + 1..bottom_y {
+            for y in center_top_y..bottom_y {
                 draw_tile(x, y, clip_x, clip_width, Tile::HEIGHT, &mut buffer_index);
             }
 
@@ -124,7 +126,7 @@ impl Camera {
 
         draw_strip(left_x, left_clip_x, left_clip_width);
 
-        for x in left_x + 1..right_x {
+        for x in center_left_x..right_x {
             draw_strip(x, 0, Tile::WIDTH);
         }
 
