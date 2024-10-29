@@ -31,6 +31,7 @@ PicoMine uses the following libraries:
 framebuffer rendering.
 * [noise](https://crates.io/crates/noise) - Simplex noise for terrain
 generation.
+* [strum](https://crates.io/crates/strum) - Enum helpers.
 
 # Credits
 PicoMine uses the color palette

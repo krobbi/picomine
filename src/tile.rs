@@ -1,12 +1,18 @@
 use std::path::PathBuf;
 
+use strum::{EnumCount, EnumIter, IntoEnumIterator};
+
 use crate::resources;
 
+/// The total number of pixels for all tile textures.
+const TEXTURE_PIXEL_COUNT: usize = Tile::COUNT * Tile::AREA;
+
 /// The textures for all tiles.
-static mut TEXTURES: [u32; Tile::COUNT * Tile::AREA] = [0; Tile::COUNT * Tile::AREA];
+static mut TEXTURES: [u32; TEXTURE_PIXEL_COUNT] = [0; TEXTURE_PIXEL_COUNT];
 
 /// A tile of a world.
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Default, EnumCount, EnumIter)]
+#[repr(u8)]
 pub enum Tile {
     /// A grass tile.
     #[default]
@@ -26,13 +32,11 @@ impl Tile {
     /// A tile's area in pixels.
     const AREA: usize = Self::WIDTH * Self::HEIGHT;
 
-    /// The number of tiles.
-    const COUNT: usize = 2;
-
     /// Loads textures for all tiles.
     pub fn load_textures() {
-        Self::Grass.load_texture();
-        Self::Stone.load_texture();
+        for tile in Self::iter() {
+            tile.load_texture();
+        }
     }
 
     /// Returns the tile's texture as a slice.
@@ -50,7 +54,7 @@ impl Tile {
 
     /// Returns the tile's texture as a mutable slice.
     fn texture_mut(self) -> &'static mut [u32] {
-        let index = self as usize * Self::AREA;
+        let index = usize::from(self as u8) * Self::AREA;
 
         // SAFETY: Mutable statics are unsafe because they may be accessed by
         // multiple threads and cause a data race. PicoMine is currently

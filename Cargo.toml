@@ -13,6 +13,7 @@ publish = false
 image = { version = "0.25.4", default-features = false, features = ["png"] }
 minifb = "0.27.0"
 noise = "0.9.0"
+strum = { version = "0.26.3", features = ["derive"] }
 
 [profile.release]
 codegen-units = 1
