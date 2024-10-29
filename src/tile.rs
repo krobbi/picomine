@@ -6,9 +6,10 @@ use crate::resources;
 static mut TEXTURES: [u32; Tile::COUNT * Tile::AREA] = [0; Tile::COUNT * Tile::AREA];
 
 /// A tile of a world.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 pub enum Tile {
     /// A grass tile.
+    #[default]
     Grass,
 
     /// A stone tile.

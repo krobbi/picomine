@@ -34,6 +34,8 @@ PicoMine uses the following libraries:
 * [image](https://crates.io/crates/image) - Texture image loading.
 * [minifb](https://crates.io/crates/minifb) - Window management, input, and
 framebuffer rendering.
+* [noise](https://crates.io/crates/noise) - Simplex noise for terrain
+generation.
 
 # Credits
 PicoMine uses the color palette

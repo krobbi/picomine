@@ -4,6 +4,7 @@
 mod camera;
 mod chunk;
 mod resources;
+mod terrain;
 mod tile;
 mod window;
 mod world;
@@ -15,10 +16,12 @@ use world::World;
 
 /// Opens a window and draws a world with a camera.
 fn main() {
+    const WORLD_SEED: u32 = 0xd981_c964;
+
     Tile::load_textures();
 
     let mut window = Window::new();
-    let mut world = World::new();
+    let mut world = World::new(WORLD_SEED);
     let mut camera = Camera::new();
     let (mut x, mut y) = (15.5, 15.5);
 

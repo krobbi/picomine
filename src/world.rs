@@ -2,19 +2,24 @@ use std::collections::HashMap;
 
 use crate::{
     chunk::{self, Chunk},
+    terrain::Terrain,
     tile::Tile,
 };
 
 /// A world containing chunks of tiles.
 pub struct World {
+    /// The world's terrain.
+    terrain: Terrain,
+
     /// The world's chunks.
     chunks: HashMap<chunk::Position, Chunk>,
 }
 
 impl World {
-    /// Creates a new world.
-    pub fn new() -> Self {
+    /// Creates a new world from its seed.
+    pub fn new(seed: u32) -> Self {
         Self {
+            terrain: Terrain::new(seed),
             chunks: HashMap::new(),
         }
     }
@@ -33,6 +38,8 @@ impl World {
 
     /// Returns or inserts the chunk at a chunk position in the world.
     fn get_chunk(&mut self, position: chunk::Position) -> &mut Chunk {
-        self.chunks.entry(position).or_insert_with(Chunk::new)
+        self.chunks
+            .entry(position)
+            .or_insert_with_key(|&p| Chunk::new(&self.terrain, p))
     }
 }
