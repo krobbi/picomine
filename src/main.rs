@@ -23,7 +23,7 @@ fn main() {
     let mut window = Window::new();
     let mut world = World::new(WORLD_SEED);
     let mut camera = Camera::new();
-    let (mut x, mut y) = (15.5, 15.5);
+    let (mut x, mut y) = (0.5, 0.5);
 
     while window.is_open() {
         {

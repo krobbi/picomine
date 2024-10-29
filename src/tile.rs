@@ -18,6 +18,9 @@ pub enum Tile {
     #[default]
     Grass,
 
+    /// A sand tile.
+    Sand,
+
     /// A stone tile.
     Stone,
 }
@@ -48,6 +51,7 @@ impl Tile {
     fn get_id_name(self) -> &'static str {
         match self {
             Self::Grass => "grass",
+            Self::Sand => "sand",
             Self::Stone => "stone",
         }
     }
