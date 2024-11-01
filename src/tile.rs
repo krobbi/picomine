@@ -23,6 +23,9 @@ pub enum Tile {
 
     /// A stone tile.
     Stone,
+
+    /// A water tile.
+    Water,
 }
 
 impl Tile {
@@ -53,6 +56,7 @@ impl Tile {
             Self::Grass => "grass",
             Self::Sand => "sand",
             Self::Stone => "stone",
+            Self::Water => "water",
         }
     }
 
