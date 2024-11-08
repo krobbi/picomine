@@ -56,14 +56,15 @@ pub struct Position {
 impl Position {
     /// Creates a new chunk position and chunk index from a tile position.
     pub fn with_index(x: i32, y: i32) -> (Self, usize) {
-        let (chunk_x, chunk_y) = (x.div_euclid(Chunk::WIDTH), y.div_euclid(Chunk::HEIGHT));
-
         #[allow(clippy::cast_sign_loss)]
         let index =
-            (x - chunk_x * Chunk::WIDTH + (y - chunk_y * Chunk::HEIGHT) * Chunk::WIDTH) as usize;
+            (x.rem_euclid(Chunk::WIDTH) + y.rem_euclid(Chunk::HEIGHT) * Chunk::WIDTH) as usize;
 
         #[allow(clippy::cast_possible_truncation)]
-        let (x, y) = (chunk_x as i16, chunk_y as i16);
+        let (x, y) = (
+            x.div_euclid(Chunk::WIDTH) as i16,
+            y.div_euclid(Chunk::HEIGHT) as i16,
+        );
 
         (Self { x, y }, index)
     }
