@@ -15,9 +15,9 @@ PicoMine is an unfinished 2D sandbox game inspired by
 
 Currently, the player can move around a pseudo-infinite, procedurally-generated
 world with the `W`, `A`, `S`, and `D` keys and slow down by holding the left
-shift key. Tiles can be selected with the `1`, `2`, `3`, and `4` keys and
-placed with the right mouse button. Tiles can be broken by holding the left
-mouse button.
+shift key. Tiles can be selected with the `1`, `2`, `3`, and `4` keys or picked
+with the middle mouse button. Tiles can be placed with the right mouse button
+and broken by holding the left mouse button.
 
 The game loads textures relative to the working directory it was started from
 in the `res/` folder. Starting the game from outside of the repository root

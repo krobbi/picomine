@@ -85,7 +85,9 @@ fn main() {
         } else {
             break_timer = 0.0;
 
-            if window.is_mouse_button_down(MouseButton::Right) {
+            if window.is_mouse_button_down(MouseButton::Middle) {
+                held_tile = world.get_tile(mouse_x, mouse_y);
+            } else if window.is_mouse_button_down(MouseButton::Right) {
                 world.set_tile(mouse_x, mouse_y, held_tile);
             }
         }
