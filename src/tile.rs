@@ -24,6 +24,9 @@ pub enum Tile {
     /// A stone tile.
     Stone,
 
+    /// A trench tile.
+    Trench,
+
     /// A water tile.
     Water,
 }
@@ -38,10 +41,19 @@ impl Tile {
     /// A tile's area in pixels.
     const AREA: usize = Self::WIDTH * Self::HEIGHT;
 
-    /// Loads textures for all tiles.
+    /// Loads the textures for all tiles.
     pub fn load_textures() {
         for tile in Self::iter() {
             tile.load_texture();
+        }
+    }
+
+    /// Returns the optional tile for replacing the tile when it is broken.
+    pub fn get_break_replacement_tile(self) -> Option<Self> {
+        match self {
+            Self::Grass | Self::Sand => Some(Self::Trench),
+            Self::Stone => Some(Self::Grass),
+            Self::Trench | Self::Water => None,
         }
     }
 
@@ -56,6 +68,7 @@ impl Tile {
             Self::Grass => "grass",
             Self::Sand => "sand",
             Self::Stone => "stone",
+            Self::Trench => "trench",
             Self::Water => "water",
         }
     }

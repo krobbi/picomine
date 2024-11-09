@@ -36,6 +36,17 @@ impl World {
         self.get_chunk(position).get_tile(index)
     }
 
+    /// Attempts to break the tile at a tile position in the world.
+    pub fn break_tile(&mut self, x: i32, y: i32) {
+        let (position, index) = chunk::Position::with_index(x, y);
+        let chunk = self.get_chunk(position);
+        let tile = chunk.get_tile(index);
+
+        if let Some(tile) = tile.get_break_replacement_tile() {
+            chunk.set_tile(index, tile);
+        }
+    }
+
     /// Returns or inserts the chunk at a chunk position in the world.
     fn get_chunk(&mut self, position: chunk::Position) -> &mut Chunk {
         self.chunks

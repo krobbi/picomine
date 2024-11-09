@@ -17,12 +17,15 @@ use world::World;
 /// Opens a window and draws a world with a camera.
 fn main() {
     const WORLD_SEED: u32 = 0xd981_c964;
+    const BREAK_TIME: f32 = 0.25;
 
     Tile::load_textures();
     let mut window = Window::new();
     let mut world = World::new(WORLD_SEED);
     let mut camera = Camera::new();
     let (mut player_x, mut player_y) = (0.5, 0.5);
+    let (mut mouse_x, mut mouse_y) = (0, 0);
+    let mut break_timer = 0.0;
     let mut held_tile = Tile::Stone;
 
     while window.is_open() {
@@ -51,6 +54,17 @@ fn main() {
             camera.set_position(player_x, player_y);
         }
 
+        {
+            let (new_mouse_x, new_mouse_y) = window.get_mouse_position();
+            let (new_mouse_x, new_mouse_y) =
+                camera.screen_to_tile_position(new_mouse_x, new_mouse_y);
+
+            if (new_mouse_x, new_mouse_y) != (mouse_x, mouse_y) {
+                (mouse_x, mouse_y) = (new_mouse_x, new_mouse_y);
+                break_timer = 0.0;
+            }
+        }
+
         if window.is_key_down(Key::Key1) {
             held_tile = Tile::Grass;
         } else if window.is_key_down(Key::Key2) {
@@ -61,10 +75,19 @@ fn main() {
             held_tile = Tile::Water;
         }
 
-        if window.is_mouse_button_down(MouseButton::Right) {
-            let (mouse_x, mouse_y) = window.get_mouse_position();
-            let (mouse_x, mouse_y) = camera.screen_to_tile_position(mouse_x, mouse_y);
-            world.set_tile(mouse_x, mouse_y, held_tile);
+        if window.is_mouse_button_down(MouseButton::Left) {
+            break_timer += window.get_delta();
+
+            if break_timer >= BREAK_TIME {
+                break_timer -= BREAK_TIME;
+                world.break_tile(mouse_x, mouse_y);
+            }
+        } else {
+            break_timer = 0.0;
+
+            if window.is_mouse_button_down(MouseButton::Right) {
+                world.set_tile(mouse_x, mouse_y, held_tile);
+            }
         }
 
         camera.draw_world(&mut world, &mut window);
