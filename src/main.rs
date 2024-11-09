@@ -19,11 +19,11 @@ fn main() {
     const WORLD_SEED: u32 = 0xd981_c964;
 
     Tile::load_textures();
-
     let mut window = Window::new();
     let mut world = World::new(WORLD_SEED);
     let mut camera = Camera::new();
-    let (mut x, mut y) = (0.5, 0.5);
+    let (mut player_x, mut player_y) = (0.5, 0.5);
+    let mut held_tile = Tile::Stone;
 
     while window.is_open() {
         {
@@ -47,24 +47,52 @@ fn main() {
                 SPEED
             } * window.get_delta();
 
-            (x, y) = (x + joy_x * velocity, y + joy_y * velocity);
-            camera.set_position(x, y);
+            (player_x, player_y) = (player_x + joy_x * velocity, player_y + joy_y * velocity);
+            camera.set_position(player_x, player_y);
         }
 
-        if window.is_mouse_button_down(MouseButton::Left) {
-            set_mouse_tile(&window, camera, &mut world, Tile::Grass);
-        } else if window.is_mouse_button_down(MouseButton::Right) {
-            set_mouse_tile(&window, camera, &mut world, Tile::Stone);
+        if window.is_key_down(Key::Key1) {
+            held_tile = Tile::Grass;
+        } else if window.is_key_down(Key::Key2) {
+            held_tile = Tile::Stone;
+        } else if window.is_key_down(Key::Key3) {
+            held_tile = Tile::Sand;
+        } else if window.is_key_down(Key::Key4) {
+            held_tile = Tile::Water;
+        }
+
+        if window.is_mouse_button_down(MouseButton::Right) {
+            let (mouse_x, mouse_y) = window.get_mouse_position();
+            let (mouse_x, mouse_y) = camera.screen_to_tile_position(mouse_x, mouse_y);
+            world.set_tile(mouse_x, mouse_y, held_tile);
         }
 
         camera.draw_world(&mut world, &mut window);
+
+        {
+            const BORDER_COLOR: u32 = 0x0d_07_09;
+
+            let buffer = window.buffer_mut();
+            let texture = held_tile.texture();
+            let mut buffer_index = Window::WIDTH + 2;
+            let mut texture_index = 0;
+            buffer[buffer_index - 1..=buffer_index + Tile::WIDTH].fill(BORDER_COLOR);
+
+            for _ in 0..Tile::HEIGHT {
+                buffer_index += Window::WIDTH;
+                buffer[buffer_index - 1] = BORDER_COLOR;
+
+                buffer[buffer_index..buffer_index + Tile::WIDTH]
+                    .copy_from_slice(&texture[texture_index..texture_index + Tile::WIDTH]);
+
+                buffer[buffer_index + Tile::WIDTH] = BORDER_COLOR;
+                texture_index += Tile::WIDTH;
+            }
+
+            buffer_index += Window::WIDTH;
+            buffer[buffer_index - 1..=buffer_index + Tile::WIDTH].fill(BORDER_COLOR);
+        }
+
         window.update();
     }
-}
-
-/// Sets a tile at the current mouse position.
-fn set_mouse_tile(window: &Window, camera: Camera, world: &mut World, tile: Tile) {
-    let (x, y) = window.get_mouse_position();
-    let (x, y) = camera.screen_to_tile_position(x, y);
-    world.set_tile(x, y, tile);
 }
